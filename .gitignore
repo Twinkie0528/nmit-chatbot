@@ -1,0 +1,5 @@
+venv/
+*.dll
+*.pyd
+*.h5
+*.ckpt
