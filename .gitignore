@@ -1,5 +1,8 @@
 venv/
-*.dll
+venv310/
+__pycache__/
 *.pyd
+*.dll
 *.h5
 *.ckpt
+.DS_Store
