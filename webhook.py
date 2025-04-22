@@ -1,11 +1,13 @@
 from flask import Flask, request
 import requests
+import os
 from processor import chatbot_response  # 🤖 chatbot-оос хариу авах
 
 app = Flask(__name__)
 
-VERIFY_TOKEN = "mini_token"
-PAGE_ACCESS_TOKEN = "EAAaq5h6ecjQBO4psINZBt6eCXVuFIHpsIbupgCVVniHM3ZClMdsBM9SP0o8sepzTXyLdmhPxxffug9r6D6yXBNs1zfNnxAthkrLR5rZAqy89n58HbjmMJncahVxGelKJ9F1FPCdbm8lKwzkmHXom4XvF3YofbXIVfNj6tILVy98EJdKZAQsheCLy39JvmAl6sgZDZD"
+# 🔐 Environment variables-оос авах
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN")
+PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -25,10 +27,10 @@ def webhook():
                 sender_id = messaging_event["sender"]["id"]
                 if "message" in messaging_event:
                     message_text = messaging_event["message"].get("text", "")
-                    
+
                     # 🤖 Chatbot-р хариу боловсруулах
                     bot_reply = chatbot_response(message_text)
-                    print("🔍 Predicted reply:", bot_reply)  # Энд лог нэмсэн
+                    print("🔍 Predicted reply:", bot_reply)
 
                     # 💬 Хариу илгээх
                     send_message(sender_id, bot_reply)
