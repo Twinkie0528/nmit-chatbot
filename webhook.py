@@ -1,7 +1,11 @@
 from flask import Flask, request
 import requests
 import os
+import nltk
 from processor import chatbot_response  # 🤖 chatbot-оос хариу авах
+
+# ✅ Нэмэгдсэн хэсэг: punkt tokenizer татах
+nltk.download('punkt')
 
 app = Flask(__name__)
 
@@ -51,4 +55,3 @@ def send_message(recipient_id, message_text):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
