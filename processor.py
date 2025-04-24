@@ -1,38 +1,48 @@
 import nltk
-from nltk.stem import WordNetLemmatizer
+import os
 import pickle
 import numpy as np
 import json
 import random
 
 from keras.models import load_model
+from nltk.tokenize import wordpunct_tokenize  # 🆕 энэ мөр нэмэгдсэн
+from nltk.stem import WordNetLemmatizer
 from pymongo import MongoClient
 from datetime import datetime
 
-# 🔡 Лемматайзер
+# ✅ nltk_data-г харуулах замыг зааж өгнө
+nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
+
+# 🧹 Лемматайзер
 lemmatizer = WordNetLemmatizer()
 
-# 💾 MongoDB холболт
-client = MongoClient("mongodb://localhost:27017/")
-db = client.chatbot_db
-questions = db.questions
+# 💾 MongoDB холболт (локал ашиглаж байгаа тул Render дээр унтраасан ч болно)
+try:
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client.chatbot_db
+    questions = db.questions
+except:
+    client = None
+    questions = None
 
 def log_user_question(user_input, intent=None):
-    questions.insert_one({
-        "question": user_input,
-        "intent": intent,
-        "timestamp": datetime.utcnow()
-    })
+    if questions:
+        questions.insert_one({
+            "question": user_input,
+            "intent": intent,
+            "timestamp": datetime.utcnow()
+        })
 
 # 🧠 Загвар болон өгөгдөл ачааллах
-model = load_model('chatbot_model.h5')
-intents = json.loads(open('job_intents.json', encoding='utf-8').read())
-words = pickle.load(open('words.pkl', 'rb'))
-classes = pickle.load(open('classes.pkl', 'rb'))
+model = load_model("chatbot_model.h5")
+intents = json.loads(open("job_intents.json", encoding="utf-8").read())
+words = pickle.load(open("words.pkl", "rb"))
+classes = pickle.load(open("classes.pkl", "rb"))
 
 # 🧹 Текст цэвэрлэх
 def clean_up_sentence(sentence):
-    sentence_words = nltk.word_tokenize(sentence)
+    sentence_words = wordpunct_tokenize(sentence)  # 🆕 nltk.word_tokenize → wordpunct_tokenize
     sentence_words = [lemmatizer.lemmatize(word.lower()) for word in sentence_words]
     return sentence_words
 
@@ -55,12 +65,10 @@ def predict_class(sentence, model):
     ERROR_THRESHOLD = 0.4
     results = [[i, r] for i, r in enumerate(res) if r > ERROR_THRESHOLD]
     results.sort(key=lambda x: x[1], reverse=True)
-
     print("🔎 Prediction Probabilities:", results)
-
     return [{"intent": classes[r[0]], "probability": str(r[1])} for r in results]
 
-# 💬 Хариу буцаах
+# 💬 JSON-оос хариу авах
 def get_json_response(ints, intents_json):
     tag = ints[0]['intent']
     for i in intents_json['intents']:
@@ -81,4 +89,4 @@ def chatbot_response(msg):
             return get_json_response(ints, intents)
 
     log_user_question(msg, "unknown")
-    return "Уучлаарай, таны асуултад хариулах боломжгүй байна. Та тэтгэлэг гэх мэтээр арай өөр үгээр асуултаа асуугаарай. "
+    return "🤖 Уучлаарай, таны асуултад хариулах боломжгүй байна. Та өөрөөр дахин оролдоорой."
