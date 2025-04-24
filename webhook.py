@@ -16,7 +16,7 @@ PAGE_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 # 🧪 Локал тест орчинд бол шууд токен өгнө
 if not PAGE_ACCESS_TOKEN:
     print("⚠️ Render-ийн PAGE_ACCESS_TOKEN олдсонгүй. Локал орчинд ажиллаж байна.")
-    PAGE_ACCESS_TOKEN = "ТАНЫ_ТЕСТ_TOKEN_ЭНД"  # ← энд локал тест токеноо оруулна
+    PAGE_ACCESS_TOKEN = "EAAaq5h6ecjQBOZBorntywdzvG8R29OX0ymYEHOeHbJhhq3hBEBTgsBGkqOxTmLTY8ZAU3T0Faf7ZCZCzMMkD8lypivCZBNYQZCEHar57AEjVAU2nZBRv3ZC74ZCCGxW6MElEB0gfD3BzXZCiHla1ZAZBQEqoEkyEvSvhR4uIblvv8PvKHihTFKvrZCd6DAzeoZCXC0TxKvOAZDZD"  # ← энд локал тест токеноо оруулна
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
