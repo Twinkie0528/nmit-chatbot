@@ -4,23 +4,24 @@ import os
 import nltk
 from processor import chatbot_response
 
-# ✅ NLTK tokenizer татах
+# 🧠 NLTK tokenizer татах
 nltk.download('punkt')
 
 app = Flask(__name__)
 
-# 🔐 Орчны хувьсагч (Render дээр ажиллана)
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "mini_token")
-PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
+# 🔐 Орчны хувьсагч (Render-д тохируулах)
+VERIFY_TOKEN = os.getenv("VERIFY_TOKEN", "mini_token")
+PAGE_ACCESS_TOKEN = os.getenv("PAGE_ACCESS_TOKEN")
 
-# ✅ Локал тест бол шууд утга өгөх
+# 🧪 Локал тест орчинд бол шууд токен өгнө
 if not PAGE_ACCESS_TOKEN:
-    print("⚠️ Render-ийн PAGE_ACCESS_TOKEN олдсонгүй. Локал тест дээр байна гэж үзэж байна.")
-    PAGE_ACCESS_TOKEN = "EAAaq5h6ecjQBOw3jZCkNtX5ZAJGPUtJqTDfWvnBTnkdOGop0kABufp2XL4DhJMIAcKNChZBQhZBneAFrlN7HvZAzUwJMaipq6pKOnOk9t3fiASRGSUsrPjqrlhFQMTWaBtY8Q4NTU0ZB27LT1AZBmbIeCJAfKlM3RCGCAyZBuV4W5Mn7997Mxt8l03TBfPczVwUWiwZDZD"  # 👉 Токеныг энд тавина уу
+    print("⚠️ Render-ийн PAGE_ACCESS_TOKEN олдсонгүй. Локал орчинд ажиллаж байна.")
+    PAGE_ACCESS_TOKEN = "ТАНЫ_ТЕСТ_TOKEN_ЭНД"  # ← энд локал тест токеноо оруулна
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
     if request.method == 'GET':
+        # ✅ Верификэйшн token шалгах
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
         if token == VERIFY_TOKEN:
@@ -31,7 +32,7 @@ def webhook():
 
     elif request.method == 'POST':
         data = request.get_json()
-        print("🔔 Message received:", data)
+        print("📩 Message received:", data)
 
         for entry in data.get("entry", []):
             for messaging_event in entry.get("messaging", []):
@@ -44,7 +45,7 @@ def webhook():
                         bot_reply = chatbot_response(message_text)
                     except Exception as e:
                         print("❌ chatbot_response алдаа:", str(e))
-                        bot_reply = "🤖 Уучлаарай, одоогоор хариу өгөх боломжгүй байна."
+                        bot_reply = "🤖 Уучлаарай, хариу өгөх явцад алдаа гарлаа."
 
                     print(f"🤖 Bot Reply: {bot_reply}")
                     send_message(sender_id, bot_reply)
@@ -53,7 +54,7 @@ def webhook():
 
 def send_message(recipient_id, message_text):
     if not PAGE_ACCESS_TOKEN:
-        print("❌ PAGE_ACCESS_TOKEN байхгүй тул хариу явуулах боломжгүй.")
+        print("❌ PAGE_ACCESS_TOKEN байхгүй тул хариу илгээх боломжгүй.")
         return
 
     url = "https://graph.facebook.com/v18.0/me/messages"
