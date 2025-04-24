@@ -6,18 +6,19 @@ import json
 import random
 
 from keras.models import load_model
-from nltk.tokenize import wordpunct_tokenize  # 🆕 энэ мөр нэмэгдсэн
+from nltk.tokenize import wordpunct_tokenize  # 🆕
 from nltk.stem import WordNetLemmatizer
 from pymongo import MongoClient
 from datetime import datetime
 
-# ✅ nltk_data-г харуулах замыг зааж өгнө
+# ✅ nltk_data path-уудыг зааж өгнө (punkt, wordnet аль аль нь)
 nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data"))
+nltk.data.path.append(os.path.join(os.path.dirname(__file__), "nltk_data", "corpora"))
 
 # 🧹 Лемматайзер
 lemmatizer = WordNetLemmatizer()
 
-# 💾 MongoDB холболт (локал ашиглаж байгаа тул Render дээр унтраасан ч болно)
+# 💾 MongoDB холболт
 try:
     client = MongoClient("mongodb://localhost:27017/")
     db = client.chatbot_db
@@ -42,7 +43,7 @@ classes = pickle.load(open("classes.pkl", "rb"))
 
 # 🧹 Текст цэвэрлэх
 def clean_up_sentence(sentence):
-    sentence_words = wordpunct_tokenize(sentence)  # 🆕 nltk.word_tokenize → wordpunct_tokenize
+    sentence_words = wordpunct_tokenize(sentence)  # 🆕 punkt биш, wordpunct ашиглаж байна
     sentence_words = [lemmatizer.lemmatize(word.lower()) for word in sentence_words]
     return sentence_words
 
