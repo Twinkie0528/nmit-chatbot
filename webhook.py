@@ -4,19 +4,19 @@ import os
 import nltk
 from processor import chatbot_response
 
-# ✅ Заавал татаж авна (Render дээр автоматаар татах)
+# ✅ NLTK tokenizer татах
 nltk.download('punkt')
 
 app = Flask(__name__)
 
-# 🔐 Орчны хувьсагчууд
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "default_verify_token")
+# 🔐 Орчны хувьсагч (Render дээр ажиллана)
+VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "mini_token")
 PAGE_ACCESS_TOKEN = os.environ.get("PAGE_ACCESS_TOKEN")
 
+# ✅ Локал тест бол шууд утга өгөх
 if not PAGE_ACCESS_TOKEN:
-    print("❌ PAGE_ACCESS_TOKEN тохируулаагүй байна!")
-if not VERIFY_TOKEN:
-    print("❌ VERIFY_TOKEN тохируулаагүй байна!")
+    print("⚠️ Render-ийн PAGE_ACCESS_TOKEN олдсонгүй. Локал тест дээр байна гэж үзэж байна.")
+    PAGE_ACCESS_TOKEN = "EAAaq5h6ecjQBOw3jZCkNtX5ZAJGPUtJqTDfWvnBTnkdOGop0kABufp2XL4DhJMIAcKNChZBQhZBneAFrlN7HvZAzUwJMaipq6pKOnOk9t3fiASRGSUsrPjqrlhFQMTWaBtY8Q4NTU0ZB27LT1AZBmbIeCJAfKlM3RCGCAyZBuV4W5Mn7997Mxt8l03TBfPczVwUWiwZDZD"  # 👉 Токеныг энд тавина уу
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
@@ -24,9 +24,9 @@ def webhook():
         token = request.args.get('hub.verify_token')
         challenge = request.args.get('hub.challenge')
         if token == VERIFY_TOKEN:
-            print("✅ Token баталгаажлаа.")
+            print("✅ VERIFY_TOKEN баталгаажлаа.")
             return challenge
-        print("❌ Token таарахгүй байна.")
+        print("❌ VERIFY_TOKEN буруу байна.")
         return 'Invalid verification token', 403
 
     elif request.method == 'POST':
